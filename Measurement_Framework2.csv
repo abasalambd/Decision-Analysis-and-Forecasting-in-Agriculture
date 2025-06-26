@@ -1,0 +1,22 @@
+variable,distribution,lower ,median,upper ,label,Description
+Soil_Organic_Inputs,posnorm,42,NA,83,Investment cost (USD/Acre),Initial investment cost
+Intercrop_Seeds,posnorm,13,NA,25,Investment cost (USD/Acre),Initial investment cost
+Training_Capacity,posnorm,17,NA,42,Investment cost (USD/Acre),Initial investment cost
+Additional_Labor,posnorm,25,NA,67,Investment cost (USD/Acre),Initial investment cost
+Soil_Health_Maintenance,posnorm,25,NA,42,Recurring Operational Costs (USD/Acre),Recurring Operational Costs
+Pest_Weed_Management,posnorm,8,NA,21,Recurring Operational Costs (USD/Acre),Recurring Operational Costs
+Monitoring_Reporting,posnorm,8,NA,17,Recurring Operational Costs (USD/Acre),Recurring Operational Costs
+Irrigation,posnorm,17,NA,30,Recurring Operational Costs (USD/Acre),Recurring Operational Costs
+Maize_Yield,posnorm,1400,NA,2500,Yield (Kg/Acre),Benefits
+Yellow_Beans_Yield,posnorm,500,NA,1000,Yield (Kg/Acre),Benefits
+Cowpea_Yield,posnorm,600,NA,1400,Yield (Kg/Acre),Benefits
+Knowledge_Gaps,posnorm,0.18,NA,0.2,Retraining (%),Risk
+Price_Variability,tnorm_0_1,0.12,NA,0.15,Price variability (%),Risk
+Pest_Disease,posnorm,0.1,NA,0.15,Cost increase (%),Risk
+Extreme_Climate_Events,posnorm,0.18,NA,0.2,Yield variability  (%),Risk
+Maize_Price,posnorm,0.08,NA,0.7,Price (USD/Kg),Crop price
+Yellow_Beans_Price,posnorm,0.8,NA,1.5,Price (USD/Kg),Crop price
+Cowpea_Price,posnorm,0.5,NA,1.25,Price (USD/Kg),Crop price
+var_CV,tnorm_0_1,0.1,NA,0.3,CoE,
+n_year,const,7,NA,7,number of years,
+discount_rate,posnorm,3,NA,5,discount rate,
