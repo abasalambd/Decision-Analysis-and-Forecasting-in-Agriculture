@@ -29,5 +29,5 @@ Maize_Price,0.08,,0.7,posnorm,Price (USD/Kg),Crop price
 Yellow_Beans_Price,0.8,,1.5,posnorm,Price (USD/Kg),Crop price
 Cowpea_Price,0.5,,1.25,posnorm,Price (USD/Kg),Crop price
 var_CV,0.1,,0.3,tnorm_0_1,CoE,
-n_year,7,,7,const,number of years,
+n_years,7,,7,const,number of years,
 discount_rate,9.75,,10.5,posnorm,discount rate,
