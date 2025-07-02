@@ -40,7 +40,7 @@ model_function <- function() {
                                       value_if = Pest_Disease_Effect_MY,
                                       value_if_not = Maize_Yield,
                                       n = n_year) 
-# hello 
+
   # Revenue per year from all three crops
   revenue_value <- (Maize_adjusted_yield * Maize_Price) +
     (Cowpea_Yield * Cowpea_Price) +
