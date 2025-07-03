@@ -1,6 +1,6 @@
 ---
 title: "Group3work- Evaluate the decision on intercropping in a monoculture farm through Decision Analysis method"
-author: 'Ahmed'
+author: 'Ahemd','Priscilla','Abdul','Adeola','Joshua Muloi'
 output: 
   html_document:
       toc: true
@@ -35,20 +35,3 @@ However, the adoption of these practices poses a critical decision-making challe
 
 ![**Figure: Impact Pathway Model**](./Conceptual_Model.png)
 
-
-
-
-
-```{r cars}
-summary(cars)
-```
-
-### Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=TRUE}
-plot(pressure)
-```
-
-Note that the `echo = FAmLSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

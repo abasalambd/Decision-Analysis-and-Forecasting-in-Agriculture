@@ -11,13 +11,13 @@ Yellow_Beans_Yield,500,,1000,posnorm,Yield (Kg/Acre),Benefits
 Cowpea_Yield,600,,1400,posnorm,Yield (Kg/Acre),Benefits
 Market_Fluctuation,0.1,,0.3,tnorm_0_1,Market Fluctuation (%),Risk
 Reduction_Sales_MF,0.2,,0.4,posnorm,Impact of Market Fluctuation,Risk
-Post_Harvest_Logistics,0.25,,0.7,tnorm_0_1,Probability(%),Risk
+Post_Harvest_Losses,0.25,,0.7,tnorm_0_1,Probability(%),Risk
 Reduction_Sale_PHL,0.1,,0.3,posnorm,Impact on Crop sales (%),Risk
 Pest_Disease_Chance_MY,0.08,,0.09,tnorm_0_1,Probability(%) for Maize yield,Risk
 Pest_Disease_Effect_MY,0.25,,0.5,posnorm,Impact on Maize Yield(%),Risk
 Pest_Disease_Effect_CY,0.2,,0.4,posnorm,Impact (%) for  Cowpeayield,Risk
 Pest_Disease_Chance_CY,0.06,,0.08,tnorm_0_1,Probability(%) for Cowpea yield,Risk
-Pest_Disease_Effect_YBY,0.15,,0.35,posnorm,Impact (%) for Yellow Beans yield,Risk
+Pest_Disease_Effect_YB,0.15,,0.35,posnorm,Impact (%) for Yellow Beans yield,Risk
 Pest_Disease_Chance_YB,0.05,,0.07,tnorm_0_1,Probability(%) for Yellow Beansyield,Risk
 Extreme_Climate_Events_MY,0.4,,0.7,posnorm,Impact of Climate on Maize Yield(%),Risk
 Extreme_Climate_Chance_MY,0.08,,0.09,tnorm_0_1,Probability(%) for Climate on Maize  yield,Risk
