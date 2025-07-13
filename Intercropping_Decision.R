@@ -193,4 +193,110 @@ ggplot(cum_df, aes(x = Year, y = Cumulative, color = Scenario)) +
     x     = "Year",
     y     = "Cumulative Profit (USD/ha)"
   ) +
-  scale_color_manual(values = c("grey40","forestgreen","darkred"))
+  scale_color_manual(values = c("grey40","forestgreen","darkred"))    
+
+
+
+
+
+
+
+
+
+
+
+#### Additional Comparative Figures ####
+
+# A) Bar chart of difference in median NPV (Intercropping minus Monoculture)
+median_npv <- tibble(
+  Scenario = c("Monoculture","Intercropping"),
+  MedianNPV = c(
+    median(combined_simulation$y[,"NPV_Monoculture"]),
+    median(combined_simulation$y[,"NPV_Intercropping"])
+  )
+)
+median_diff <- median_npv %>%
+  spread(Scenario, MedianNPV) %>%
+  transmute(Difference = Intercropping - Monoculture)
+
+ggplot(median_diff, aes(x = "", y = Difference, fill = Difference > 0)) +
+  geom_col(width = 0.4) +
+  coord_flip() +
+  scale_fill_manual(values = c("TRUE"="forestgreen","FALSE"="firebrick")) +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Median NPV Difference: Intercropping – Monoculture",
+    x     = NULL, y = "USD/ha"
+  ) +
+  theme(legend.position="none")
+
+
+#### B) Stacked area of mean annual cashflow by scenario ####
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+# 1) Identify cashflow columns in the simulation output
+mono_cols <- grep("^Cashflow_Monoculture", names(combined_simulation$y), value = TRUE)
+int_cols  <- grep("^Cashflow_Intercropping", names(combined_simulation$y), value = TRUE)
+
+# 2) Sanity check
+if (length(mono_cols) == 0 || length(int_cols) == 0) {
+  stop(
+    "Cashflow columns not found!\n",
+    "  Monoculture cashflow cols: ", paste(mono_cols, collapse = ", "), "\n",
+    "  Intercropping cashflow cols: ", paste(int_cols, collapse = ", ")
+  )
+}
+
+
+
+
+
+#### 1) Full cashflow comparison over time (all years) ####
+# This uses decisionSupport’s built-in plot_cashflow
+plot_cashflow(
+  mcSimulation_object = combined_simulation,
+  cashflow_var_name   = c("Cashflow_Monoculture",
+                          "Cashflow_Intercropping",
+                          "Cashflow_Decision"),
+  x_axis_name         = "Year",
+  y_axis_name         = "Annual Profit (USD/ha)",
+  facet_labels        = c("Monoculture","Intercropping","Decision"),
+  base_size           = 12
+)
+
+#### B) Side‐by‐side boxplots of annual cashflows by year ####
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+cf_mat <- combined_simulation$y %>% 
+  select(starts_with("Cashflow_"))
+
+cf_long <- cf_mat %>% 
+  pivot_longer(
+    cols      = everything(),
+    names_to  = "variable",
+    values_to = "Profit"
+  ) %>%
+  extract(
+    col   = variable,
+    into  = c("Scenario","Year"),
+    regex = "^Cashflow_([^\\.]+)\\.(\\d+)$"
+  ) %>%
+  mutate(
+    Year     = as.integer(Year),
+    Scenario = factor(Scenario, c("Monoculture","Intercropping","Decision"))
+  )
+
+ggplot(cf_long, aes(x = factor(Year), y = Profit, fill = Scenario)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  theme_minimal(base_size = 12) +
+  labs(
+    title = "Annual Profit by Year and Scenario",
+    x     = "Year",
+    y     = "Profit (USD/ha)"
+  ) +
+  scale_fill_brewer(palette = "Set2")
