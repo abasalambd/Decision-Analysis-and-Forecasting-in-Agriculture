@@ -1,6 +1,6 @@
 variable,lower,median,upper,distribution,label,description
 Total_Seeds_Cost,13,,25,posnorm,Investment cost (USD/Acre),Initial investment cost
-Maize_Seeds_Cost  ,10,,22,posnorm,Investment cost (USD/Acre),Initial investment cost
+Maize_Seeds_Cost,10,,22,posnorm,Investment cost (USD/Acre),Initial investment cost
 Training_Capacity_Int,17,,42,posnorm,Investment cost (USD/Acre),Initial investment cost
 Additional_Labor_Int,25,,67,posnorm,Recurring Operational Costs (USD/Acre),Recurring Operational Costs
 Soil_Health_Maintenance_Mono,10,,35,posnorm,Recurring Operational Costs (USD/Acre),Recurring Operational Costs
