@@ -5,7 +5,7 @@ library(decisionSupport)
 library(ggplot2)
 
 # 2) Read the unified input table
-input_data <- read.csv("Data/Input_Table.csv", stringsAsFactors = FALSE)
+input_data <- read.csv("data/Input_File.csv", stringsAsFactors = FALSE)
 
 # 3) Convert to estimate object and draw one set of inputs into the environment
 estimates <- as.estimate(input_data)
@@ -180,4 +180,3 @@ plot_distributions(
   method              = "smooth_simple_overlay",
   base_size           = 7
 )
-
