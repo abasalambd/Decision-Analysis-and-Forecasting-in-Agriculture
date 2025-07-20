@@ -181,54 +181,36 @@ model_function <- function() {
 combined_simulation <- mcSimulation(
   estimate          = estimates,
   model_function    = model_function,
-  numberOfModelRuns = 10000,
+  numberOfModelRuns = 1000,
   functionSyntax    = "plainNames" )
-# Plot both NPV distributions together
-plot_distributions(
-  mcSimulation_object = combined_simulation,
-  vars                = c("NPV_Monoculture","NPV_Intercropping"),
-  method              = "hist_simple_overlay", base_size = 7 )
-plot_distributions(
-  mcSimulation_object = combined_simulation,
-  vars                = c("NPV_Monoculture","NPV_Intercropping"),
-  method              = "smooth_simple_overlay", base_size = 7 )
+
+
+
+# Plot distributions 
 plot_distributions(
   mcSimulation_object = combined_simulation,
   vars                = "NPV_Monoculture",
-  method              = "boxplot_density", base_size = 7 )
+  method              = "boxplot_density", base_size = 7,
+  x_axis_name = "Outcome distribution (USD/ha)")
+
 plot_distributions(
   mcSimulation_object = combined_simulation,
   vars                = "NPV_Intercropping",
-  method              = "boxplot_density", base_size = 7 )
+  method              = "boxplot_density", base_size = 7,
+  x_axis_name = "Outcome distribution (USD/ha)")
 
-# Compound figure of NPV and cashflow for monoculture
-compound_figure(
-  # mcSimulation_object = combined_simulation,
-  model = model_function,
-  input_table = input_data,
-  decision_var_name = "NPV_Monoculture",
-  cashflow_var_name = "Cashflow_Monoculture",
-  model_runs = 10000, 
-  distribution_method = 'smooth_simple_overlay')
 
-# Combine inputs and both NPVs into one data frame
-df_evpi <- data.frame(
-           combined_simulation$x,
-           NPV_Monoculture   = combined_simulation$y[, "NPV_Monoculture"],
-           NPV_Intercropping = combined_simulation$y[, "NPV_Intercropping"] )
+plot_distributions(
+  mcSimulation_object = combined_simulation,
+  vars                = "NPV_Decision",
+  method              = "boxplot_density", base_size = 7, 
+  x_axis_name = "Outcome distribution (USD/ha)" )
 
-# Calculate EVPI for all inputs, starting at Monoculture_NPV
-EVPI_results <- multi_EVPI(
-                mc            = df_evpi,
-                first_out_var = "NPV_Monoculture" )
-
-# Inspect the EVPI table
-print(EVPI_results)
-
-# Plot EVPI for both scenarios side by side
-plot_evpi(
-         EVPIresults   = EVPI_results,
-         decision_vars = c("NPV_Monoculture", "NPV_Intercropping"))
+plot_distributions(
+  mcSimulation_object = combined_simulation,
+  vars                = c("NPV_Monoculture","NPV_Intercropping"),
+  method              = "smooth_simple_overlay", base_size = 7,
+  x_axis_name = "Outcome distribution (USD/ha)")
 
 
 #### Cashflow (Annual Profit) Comparison for Both Scenarios ####
@@ -255,6 +237,138 @@ plot_cashflow(
   facet_labels        = c("Monoculture", "Intercropping"))
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##EVPI is not completed fro here
+# Combine inputs and both NPVs into one data frame
+#( Please do understand, complete EVPI what needed )
+# 1) Combine inputs and both NPVs into one data frame
+df_evpi <- data.frame(
+  combined_simulation$x,
+  # NPV_Monoculture   = combined_simulation$y[, "NPV_Monoculture"],
+  # NPV_Intercropping = combined_simulation$y[, "NPV_Intercropping"],
+  NPV_Decision = combined_simulation$y[, "NPV_Decision"]
+  
+)
+df <- data.frame(combined_simulation$x, combined_simulation$y[1:3])
+
+
+# 2) Calculate EVPI for all inputs, starting at Monoculture_NPV
+EVPI_results <- multi_EVPI(
+  mc            = df,
+  first_out_var = "NPV_Monoculture"
+)
+plot_evpi(EVPIresults = EVPI_results, decision_vars = "NPV_Decision")
+# 3) Inspect the EVPI table
+print(EVPI_results)
+
+# 4) Plot EVPI for both scenarios side by side
+plot_evpi(
+  EVPIresults   = EVPI_results,
+  decision_vars = c("NPV_Decision")
+
+
+
+
+
+
+
+df_evpi <- data.frame(
+  combined_simulation$x,
+  NPV_Monoculture   = combined_simulation$y[, "NPV_Monoculture"],
+  NPV_Intercropping = combined_simulation$y[, "NPV_Intercropping"] )
+
+# Calculate EVPI for all inputs, starting at Monoculture_NPV 
+
+EVPI_results <- multi_EVPI(
+  mc            = df_evpi,
+  first_out_var = "NPV_Monoculture" )
+
+# Inspect the EVPI table
+print(EVPI_results)
+
+# Plot EVPI for both scenarios side by side
+plot_evpi(
+  EVPIresults   = EVPI_results,
+  decision_vars = c("NPV_Monoculture", "NPV_Intercropping"))
+
+
+
+
+
+###Variable Importance in Projection
+
+
+
+
+
+# Compound figure of NPV and cashflow for monoculture
+compound_figure(
+  # mcSimulation_object = combined_simulation,
+  model = model_function,
+  input_table = input_data,
+  decision_var_name = "NPV_Monoculture",
+  cashflow_var_name = "Cashflow_Monoculture",
+  model_runs = 1000, 
+  distribution_method = 'smooth_simple_overlay')
+
+compound_figure(
+  # mcSimulation_object = combined_simulation,
+  model = model_function,
+  input_table = input_data,
+  decision_var_name = "NPV_Intercropping",
+  cashflow_var_name = "Cashflow_Intercropping",
+  model_runs = 1000, 
+  distribution_method = 'smooth_simple_overlay')
+
+compound_figure(
+  # mcSimulation_object = combined_simulation,
+  model = model_function,
+  input_table = input_data,
+  decision_var_name = "NPV_Decision",
+  cashflow_var_name = "Cashflow_Decision",
+  model_runs = 1000, 
+  distribution_method = 'smooth_simple_overlay')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+####Additional Figures####
+
+
 # Identify the exact column names for Year-n_years
 mono_cols <- grep("^Cashflow_Monoculture\\.", names(combined_simulation$y),
              value = TRUE)
@@ -272,15 +386,11 @@ int_final  <- combined_simulation$y[[final_year_col_int ]]
 mono_q <- quantile(mono_final, probs = c(0.3, 0.7))
 int_q  <- quantile(int_final,  probs = c(0.3, 0.7))
 
-
 # Print the results
 cat("Monoculture Year", n_years, "Profit 30th & 70th percentiles:\n")
     print(mono_q)
 cat("\nIntercropping Year", n_years, "Profit 30th & 70th percentiles:\n")
     print(int_q)
-
-
-#### Additional Result Graphs ####
 
 # Side-by-side boxplots of NPV
 npv_df <- data.frame(
@@ -323,7 +433,6 @@ if (!(length(mono_cols)==n_years && length(int_cols)==n_years &&
 mono_med_cum <- apply(combined_simulation$y[, mono_cols], 2, median)
 int_med_cum  <- apply(combined_simulation$y[, int_cols],  2, median)
 dec_med_cum  <- apply(combined_simulation$y[, dec_cols],  2, median)
-
 
 # Build long data.frame for just Monoculture & Intercropping
 year_seq <- seq_len(n_years)
