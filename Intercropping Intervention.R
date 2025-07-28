@@ -1,14 +1,16 @@
-#### Intercropping in a monoculture farm through Decision Analysis ####
+#### Intercropping in a monoculture farm through Decision Analysis (USD per acre) ####
 
 ## Load required packages
 library(decisionSupport)
 library(ggplot2)
-
-# Read the unified input table
+library(dplyr)
+library(pls)
+## Read  unified input table
 input_data <- read.csv("data/Input_File.csv", stringsAsFactors = FALSE)
 
-# Convert to estimate object and draw one set of inputs into the environment
+## Convert to estimate object & draw one random sample
 estimates <- as.estimate(input_data)
+
 make_variables <- function(est, n = 1) {
   x <- random(rho = est, n = n)
   for (nm in colnames(x)) {
@@ -18,7 +20,7 @@ make_variables <- function(est, n = 1) {
 
 make_variables(estimates, n = 1)
 
-# Define a single model function that computes both scenarios
+## Define a single model function that computes both scenarios
 model_function <- function() {
   
   ### Monoculture: Initial cost
@@ -181,9 +183,8 @@ model_function <- function() {
 combined_simulation <- mcSimulation(
   estimate          = estimates,
   model_function    = model_function,
-  numberOfModelRuns = 1000,
+  numberOfModelRuns = 10000,
   functionSyntax    = "plainNames" )
-
 
 
 # Plot distributions 
@@ -191,26 +192,26 @@ plot_distributions(
   mcSimulation_object = combined_simulation,
   vars                = "NPV_Monoculture",
   method              = "boxplot_density", base_size = 7,
-  x_axis_name = "Outcome distribution (USD/ha)")
+  x_axis_name = "Outcome distribution (USD/acre)")
 
 plot_distributions(
   mcSimulation_object = combined_simulation,
   vars                = "NPV_Intercropping",
   method              = "boxplot_density", base_size = 7,
-  x_axis_name = "Outcome distribution (USD/ha)")
+  x_axis_name = "Outcome distribution (USD/acre)")
 
 
 plot_distributions(
   mcSimulation_object = combined_simulation,
   vars                = "NPV_Decision",
   method              = "boxplot_density", base_size = 7, 
-  x_axis_name = "Outcome distribution (USD/ha)" )
+  x_axis_name = "Outcome distribution (USD/acre)" )
 
 plot_distributions(
   mcSimulation_object = combined_simulation,
   vars                = c("NPV_Monoculture","NPV_Intercropping"),
   method              = "smooth_simple_overlay", base_size = 7,
-  x_axis_name = "Outcome distribution (USD/ha)")
+  x_axis_name = "Outcome distribution (USD/acre)")
 
 
 #### Cashflow (Annual Profit) Comparison for Both Scenarios ####
@@ -220,7 +221,7 @@ plot_cashflow(
   mcSimulation_object = combined_simulation,
   cashflow_var_name   = c("Cashflow_Monoculture", "Cashflow_Intercropping"),
   x_axis_name         = "Year",
-  y_axis_name         = "Annual Profit (USD/ha)",
+  y_axis_name         = "Annual Profit (USD/acre)",
   color_25_75         = "blue",
   color_5_95          = "lightblue",
   color_median        = "darkblue",
@@ -230,242 +231,93 @@ plot_cashflow(
   mcSimulation_object = combined_simulation,
   cashflow_var_name   = c("CumCashflow_Monoculture", "CumCashflow_Intercropping"),
   x_axis_name         = "Year",
-  y_axis_name         = "Annual Profit (USD/ha)",
+  y_axis_name         = "Cumulative Annual Profit (USD/acre)",
   color_25_75         = "blue",
   color_5_95          = "lightblue",
   color_median        = "darkblue",
   facet_labels        = c("Monoculture", "Intercropping"))
 
 
+#### EVPI Analysis ####
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-##EVPI is not completed fro here
-# Combine inputs and both NPVs into one data frame
-#( Please do understand, complete EVPI what needed )
-# 1) Combine inputs and both NPVs into one data frame
+# Build data frame of inputs + decision NPV difference
 df_evpi <- data.frame(
   combined_simulation$x,
-  # NPV_Monoculture   = combined_simulation$y[, "NPV_Monoculture"],
-  # NPV_Intercropping = combined_simulation$y[, "NPV_Intercropping"],
-  NPV_Decision = combined_simulation$y[, "NPV_Decision"]
-  
+  NPV_Decision = combined_simulation$y[ , "NPV_Decision"]
 )
-df <- data.frame(combined_simulation$x, combined_simulation$y[1:3])
 
-
-# 2) Calculate EVPI for all inputs, starting at Monoculture_NPV
-EVPI_results <- multi_EVPI(
-  mc            = df,
-  first_out_var = "NPV_Monoculture"
-)
-plot_evpi(EVPIresults = EVPI_results, decision_vars = "NPV_Decision")
-# 3) Inspect the EVPI table
-print(EVPI_results)
-
-# 4) Plot EVPI for both scenarios side by side
-plot_evpi(
-  EVPIresults   = EVPI_results,
-  decision_vars = c("NPV_Decision")
-
-
-
-
-
-
-
-df_evpi <- data.frame(
-  combined_simulation$x,
-  NPV_Monoculture   = combined_simulation$y[, "NPV_Monoculture"],
-  NPV_Intercropping = combined_simulation$y[, "NPV_Intercropping"] )
-
-# Calculate EVPI for all inputs, starting at Monoculture_NPV 
-
+# Calculate EVPI (starting from the decision outcome)
 EVPI_results <- multi_EVPI(
   mc            = df_evpi,
-  first_out_var = "NPV_Monoculture" )
+  first_out_var = "NPV_Decision"
+)
 
-# Inspect the EVPI table
+# Print EVPI table
 print(EVPI_results)
 
-# Plot EVPI for both scenarios side by side
+# Plot EVPI for the decision variable
 plot_evpi(
   EVPIresults   = EVPI_results,
-  decision_vars = c("NPV_Monoculture", "NPV_Intercropping"))
-
-
-
-
-
-###Variable Importance in Projection
-
-
-
-
-
-# Compound figure of NPV and cashflow for monoculture
-compound_figure(
-  # mcSimulation_object = combined_simulation,
-  model = model_function,
-  input_table = input_data,
-  decision_var_name = "NPV_Monoculture",
-  cashflow_var_name = "Cashflow_Monoculture",
-  model_runs = 1000, 
-  distribution_method = 'smooth_simple_overlay')
-
-compound_figure(
-  # mcSimulation_object = combined_simulation,
-  model = model_function,
-  input_table = input_data,
-  decision_var_name = "NPV_Intercropping",
-  cashflow_var_name = "Cashflow_Intercropping",
-  model_runs = 1000, 
-  distribution_method = 'smooth_simple_overlay')
-
-compound_figure(
-  # mcSimulation_object = combined_simulation,
-  model = model_function,
-  input_table = input_data,
-  decision_var_name = "NPV_Decision",
-  cashflow_var_name = "Cashflow_Decision",
-  model_runs = 1000, 
-  distribution_method = 'smooth_simple_overlay')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-####Additional Figures####
-
-
-# Identify the exact column names for Year-n_years
-mono_cols <- grep("^Cashflow_Monoculture\\.", names(combined_simulation$y),
-             value = TRUE)
-int_cols  <- grep("^Cashflow_Intercropping\\.", names(combined_simulation$y),
-             value = TRUE)
-
-final_year_col_mono <- mono_cols[grepl(paste0("\\.", n_years, "$"), mono_cols)][1]
-final_year_col_int  <- int_cols[ grepl(paste0("\\.", n_years, "$"), int_cols)][1]
-
-# Extract those columns as numeric vectors
-mono_final <- combined_simulation$y[[final_year_col_mono]]
-int_final  <- combined_simulation$y[[final_year_col_int ]]
-
-# Compute the 30th and 70th percentiles for Year-n_years
-mono_q <- quantile(mono_final, probs = c(0.3, 0.7))
-int_q  <- quantile(int_final,  probs = c(0.3, 0.7))
-
-# Print the results
-cat("Monoculture Year", n_years, "Profit 30th & 70th percentiles:\n")
-    print(mono_q)
-cat("\nIntercropping Year", n_years, "Profit 30th & 70th percentiles:\n")
-    print(int_q)
-
-# Side-by-side boxplots of NPV
-npv_df <- data.frame(
-          Monoculture   = combined_simulation$y[, "NPV_Monoculture"],
-          Intercropping = combined_simulation$y[, "NPV_Intercropping"])
-
-npv_long <- pivot_longer(
-            npv_df,
-            cols      = everything(),
-            names_to  = "Scenario",
-            values_to = "NPV")
-
-ggplot(npv_long, aes(x = Scenario, y = NPV, fill = Scenario)) +
-       geom_boxplot(alpha = 0.6) +
-       theme_minimal(base_size = 14) +
-       labs(
-       title = "NPV Distribution: Monoculture vs. Intercropping",
-       x     = NULL,
-       y     = "Net Present Value (USD/ha)"
-       ) +
-       scale_fill_manual(values = c("grey40", "forestgreen")) +
-       theme(legend.position = "none")
-
-
-# Grab columns
-mono_cols <- grep("^CumCashflow_Monoculture",   names(combined_simulation$y),
-                  value = TRUE)
-int_cols  <- grep("^CumCashflow_Intercropping", names(combined_simulation$y), 
-                  value = TRUE)
-dec_cols  <- grep("^CumCashflow_Decision",      names(combined_simulation$y), 
-                  value = TRUE)
-
-# Sanity check
-if (!(length(mono_cols)==n_years && length(int_cols)==n_years && 
-      length(dec_cols)==n_years)) {
-      stop(sprintf("Expect %d years, got %d mono, %d int, %d dec",
-      n_years, length(mono_cols), length(int_cols), length(dec_cols)))}
-
-# Compute medians per year
-mono_med_cum <- apply(combined_simulation$y[, mono_cols], 2, median)
-int_med_cum  <- apply(combined_simulation$y[, int_cols],  2, median)
-dec_med_cum  <- apply(combined_simulation$y[, dec_cols],  2, median)
-
-# Build long data.frame for just Monoculture & Intercropping
-year_seq <- seq_len(n_years)
-cum_df <- data.frame(
-          Year       = rep(year_seq, times = 2),
-          Cumulative = c(mono_med_cum, int_med_cum),
-          Scenario   = rep(c("Monoculture","Intercropping"), each = n_years))
-
-# Plot it
-ggplot(cum_df, aes(x = Year, y = Cumulative, color = Scenario)) +
-      geom_line(size = 1.2) +
-      geom_point(size = 2) +
-      theme_minimal(base_size = 14) +
-      labs(
-      title = "Median Cumulative Profit Over Time",
-      x     = "Year",
-      y     = "Cumulative Profit (USD/ha)"
-      ) +
-      scale_color_manual(values = c("grey40","forestgreen"))
-
-
-
-
-
-
-
-
-
-
-set.seed()   # I could not make this arguments for that function,
-#  I did not understand. th
-
-
-
-
-
+  decision_vars = "NPV_Decision"
+)
+
+
+#### Variable Importance in Projection (VIP) ####
+
+# Prepare PLS data: inputs + response
+pls_data <- data.frame(
+  combined_simulation$x,
+  NPV_Decision = combined_simulation$y[ , "NPV_Decision"]
+) %>%
+  select_if(~ var(.) > 0)  # drop constant columns
+
+# Fit PLSR model (10-fold CV, jackknife)
+set.seed(123)
+pls_model <- plsr(
+  NPV_Decision ~ .,
+  data       = pls_data,
+  scale      = TRUE,
+  validation = "CV",
+  segments   = 10,
+  jackknife  = TRUE
+)
+
+# Determine optimal number of components via RMSEP
+optimal_comp <- which.min(RMSEP(pls_model)$val[1,,]) - 1
+
+# VIP calculation helper
+calculate_vip <- function(model) {
+  W  <- model$loading.weights
+  Tm <- model$scores
+  Q  <- model$Yloadings
+  SS <- (Q^2) * colSums(Tm^2)
+  W2 <- W^2
+  vip <- sqrt(
+    nrow(W) *
+      rowSums(sweep(W2, 2, SS / colSums(W2), "*")) /
+      sum(SS)
+  )
+  names(vip) <- rownames(W)
+  vip
+}
+
+# Compute VIP scores & assemble into a tibble
+vip_scores <- calculate_vip(pls_model)
+vip_df <- tibble(
+  Variable = names(vip_scores),
+  VIP      = vip_scores
+) %>%
+  arrange(desc(VIP))
+
+# Plot top 15 VIPs
+ggplot(head(vip_df, 15), aes(x = reorder(Variable, VIP), y = VIP)) +
+  geom_col(fill = "#E15759", alpha = 0.8, width = 0.7) +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "red") +
+  coord_flip() +
+  labs(
+    title    = "Variable Importance in Projection",
+    subtitle = paste("Top 15 variables —", optimal_comp, "PLS components"),
+    x        = NULL,
+    y        = "VIP Score"
+  ) +
+  theme_minimal(base_size = 12)
