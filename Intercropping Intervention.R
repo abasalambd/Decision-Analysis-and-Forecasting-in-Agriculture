@@ -23,6 +23,8 @@ make_variables(estimates, n = 1)
 ## Define a single model function that computes both scenarios
 model_function <- function() {
   
+  # project planning horizon
+  n_years <- 7
   ### Monoculture: Initial cost
   
   mono_seed_ts <- vv(Maize_Seeds_Cost, var_CV = var_CV, n = n_years)
@@ -163,15 +165,18 @@ model_function <- function() {
   CumCashflow_Decision <- cumsum(Cashflow_Decision)
   NPV_Decision         <- NPV_Intercropping - NPV_Monoculture
   
+  CumCashflow_Monoculture   <- cumsum(Cashflow_Monoculture)
+  CumCashflow_Intercropping <- cumsum(Cashflow_Intercropping)
+  CumCashflow_Decision      <- cumsum(Cashflow_Decision)
   
   ## Return all outputs
   return(list(
-    NPV_Monoculture        = NPV_Monoculture,
-    NPV_Intercropping      = NPV_Intercropping,
-    NPV_Decision           = NPV_Decision,
-    Cashflow_Monoculture   = Cashflow_Monoculture,
-    Cashflow_Intercropping = Cashflow_Intercropping,
-    Cashflow_Decision      = Cashflow_Decision,
+    NPV_Monoculture           = NPV_Monoculture,
+    NPV_Intercropping         = NPV_Intercropping,
+    NPV_Decision              = NPV_Decision,
+    Cashflow_Monoculture      = Cashflow_Monoculture,
+    Cashflow_Intercropping    = Cashflow_Intercropping,
+    Cashflow_Decision         = Cashflow_Decision,
     CumCashflow_Monoculture   = CumCashflow_Monoculture,
     CumCashflow_Intercropping = CumCashflow_Intercropping,
     CumCashflow_Decision      = CumCashflow_Decision
