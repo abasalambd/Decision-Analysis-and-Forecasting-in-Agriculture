@@ -365,7 +365,7 @@ if (!any(positive_evpi, na.rm = TRUE)) {
 }
 ```
 ## Variable Importance in Projection
-```{r vip-analysis, echo=TRUE, fig.align='center', fig.width=7, fig.height=5, out.width='70%', fig.cap='**Figure 8**: Variable Importance in Projection (Top 15 variables — `r opt_comp` PLS components)'}
+```{r vip-analysis, echo=TRUE, fig.align='center', fig.width=7, fig.height=5, out.width='70%', fig.cap='**Figure 8**: Variable Importance in Projection (Top 15 variables)'}
 pls_data <- data.frame(combined_simulation$x,
                        NPV_Decision = combined_simulation$y[, "NPV_Decision"]) %>%
   select_if(~ var(.) > 0)
