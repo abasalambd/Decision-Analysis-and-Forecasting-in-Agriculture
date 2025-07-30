@@ -23,7 +23,7 @@ make_variables(estimates, n = 1)
 ## Define a single model function that computes both scenarios
 model_function <- function() {
   
-  # project planning horizon
+  #project planning
   n_years <- 7
   ### Monoculture: Initial cost
   
@@ -31,42 +31,42 @@ model_function <- function() {
   
   ### Monoculture: Recurring costs  
   mono_recur_val <- Pest_Weed_Management_Mono + Crop_Maintenance_Mono +
-                    Irrigation_Mono
+    Irrigation_Mono
   pest_mono <- vv(Pest_Weed_Management_Mono, var_CV = var_CV, n = n_years)
   cropm_mono <- vv(Crop_Maintenance_Mono, var_CV = var_CV, n = n_years)
   irr_mono <- vv(Irrigation_Mono, var_CV = var_CV, n = n_years)
   mono_recur_ts  <- c( vv(var_mean = mono_recur_val,
-                    var_CV = var_CV, n = n_years), 0)
+                          var_CV = var_CV, n = n_years), 0)
   mono_cost_ts   <- mono_seed_ts + pest_mono + cropm_mono + irr_mono
   
   ### Monoculture: Pest & climate adjustments
   mono_pest_ts    <- chance_event(
-                     chance       = Pest_Disease_Chance_MY,
-                     value_if     = Maize_Yield * (1 - Pest_Disease_Effect_MY),
-                     value_if_not = Maize_Yield,
-                     n            = n_years )
+    chance       = Pest_Disease_Chance_MY,
+    value_if     = Maize_Yield * (1 - Pest_Disease_Effect_MY),
+    value_if_not = Maize_Yield,
+    n            = n_years )
   
   mono_climate_ts <- chance_event(
-                     chance       = Extreme_Climate_Chance_MY,
-                     value_if     = mono_pest_ts * (1 - Extreme_Climate_Events_MY),
-                     value_if_not = mono_pest_ts,
-                     n            = n_years )
+    chance       = Extreme_Climate_Chance_MY,
+    value_if     = mono_pest_ts * (1 - Extreme_Climate_Events_MY),
+    value_if_not = mono_pest_ts,
+    n            = n_years )
   
   ### Monoculture: Revenue after losses
   mono_rev_base_ts <- vv(
-                      var_mean = mono_climate_ts * Maize_Price,
-                      var_CV   = var_CV,
-                      n        = n_years )
+    var_mean = mono_climate_ts * Maize_Price,
+    var_CV   = var_CV,
+    n        = n_years )
   mono_phl_factor  <- chance_event(
-                      chance       = Post_Harvest_Losses,
-                      value_if     = 1 - Reduction_Sale_PHL,
-                      value_if_not = 1,
-                      n            = n_years )
+    chance       = Post_Harvest_Losses,
+    value_if     = 1 - Reduction_Sale_PHL,
+    value_if_not = 1,
+    n            = n_years )
   mono_mf_factor   <- chance_event(
-                      chance       = Market_Fluctuation,
-                      value_if     = 1 - Reduction_Sales_MF,
-                      value_if_not = 1,
-                      n            = n_years )
+    chance       = Market_Fluctuation,
+    value_if     = 1 - Reduction_Sales_MF,
+    value_if_not = 1,
+    n            = n_years )
   
   mono_rev_ts      <- mono_rev_base_ts * mono_phl_factor * mono_mf_factor
   
@@ -74,8 +74,8 @@ model_function <- function() {
   Cashflow_Monoculture    <- mono_rev_ts - mono_cost_ts 
   CumCashflow_Monoculture <- cumsum(Cashflow_Monoculture)
   NPV_Monoculture         <- discount(Cashflow_Monoculture,
-                             discount_rate = discount_rate,
-                             calculate_NPV = TRUE)
+                                      discount_rate = discount_rate,
+                                      calculate_NPV = TRUE)
   
   ## -- Intercropping intervention --
   
@@ -92,64 +92,64 @@ model_function <- function() {
   ### Intercropping: Recurring costs
   
   int_recur_val <- Pest_Weed_Management_Int + Crop_Maintenance_Int +
-                   Irrigation_Int + Additional_Labor_Int
+    Irrigation_Int + Additional_Labor_Int
   pest_int <- vv(Pest_Weed_Management_Int, var_CV = var_CV, n = n_years)
   cropm_int <- vv(Crop_Maintenance_Int, var_CV = var_CV, n = n_years)
   irr_int <- vv(Irrigation_Int, var_CV = var_CV, n = n_years)
   addl_int <- vv(Additional_Labor_Int, var_CV = var_CV, n = n_years)
   int_recur_ts  <- c( vv(var_mean = int_recur_val, var_CV = var_CV,
-                   n = n_years), 0)
+                         n = n_years), 0)
   int_cost_ts   <- ini_int_cost + pest_int + cropm_int + irr_int + addl_int
   
   ### Intercropping: Pest & climate adjustments
   maize_adj_ts  <- chance_event(
-                   chance       = Pest_Disease_Chance_MY,
-                   value_if     = Maize_Yield * (1 - Pest_Disease_Effect_MY),
-                   value_if_not = Maize_Yield,
-                   n            = n_years )
+    chance       = Pest_Disease_Chance_MY,
+    value_if     = Maize_Yield * (1 - Pest_Disease_Effect_MY),
+    value_if_not = Maize_Yield,
+    n            = n_years )
   maize_cl_ts   <- chance_event(
-                   chance       = Extreme_Climate_Chance_MY,
-                   value_if     = maize_adj_ts * (1 - Extreme_Climate_Events_MY),
-                   value_if_not = maize_adj_ts,
-                   n            = n_years )
+    chance       = Extreme_Climate_Chance_MY,
+    value_if     = maize_adj_ts * (1 - Extreme_Climate_Events_MY),
+    value_if_not = maize_adj_ts,
+    n            = n_years )
   cowpea_adj_ts <- chance_event(
-                   chance       = Pest_Disease_Chance_CY,
-                   value_if     = Cowpea_Yield * (1 - Pest_Disease_Effect_CY),
-                   value_if_not = Cowpea_Yield,
-                   n            = n_years )
+    chance       = Pest_Disease_Chance_CY,
+    value_if     = Cowpea_Yield * (1 - Pest_Disease_Effect_CY),
+    value_if_not = Cowpea_Yield,
+    n            = n_years )
   cowpea_cl_ts  <- chance_event(
-                   chance       = Extreme_Climate_Chance_CY,
-                   value_if     = cowpea_adj_ts * (1 - Extreme_Climate_Events_CY),
-                   value_if_not = cowpea_adj_ts,
-                   n            = n_years )
+    chance       = Extreme_Climate_Chance_CY,
+    value_if     = cowpea_adj_ts * (1 - Extreme_Climate_Events_CY),
+    value_if_not = cowpea_adj_ts,
+    n            = n_years )
   yellow_adj_ts <- chance_event(
-                   chance       = Pest_Disease_Chance_YB,
-                   value_if     = Yellow_Beans_Yield * (1 - Pest_Disease_Effect_YB),
-                   value_if_not = Yellow_Beans_Yield,
-                   n            = n_years )
+    chance       = Pest_Disease_Chance_YB,
+    value_if     = Yellow_Beans_Yield * (1 - Pest_Disease_Effect_YB),
+    value_if_not = Yellow_Beans_Yield,
+    n            = n_years )
   yellow_cl_ts  <- chance_event( 
-                   chance       = Extreme_Climate_Chance_YB,
-                   value_if     = yellow_adj_ts * (1 - Extreme_Climate_Events_YB),
-                   value_if_not = yellow_adj_ts,
-                   n            = n_years)
+    chance       = Extreme_Climate_Chance_YB,
+    value_if     = yellow_adj_ts * (1 - Extreme_Climate_Events_YB),
+    value_if_not = yellow_adj_ts,
+    n            = n_years)
   
   
   ### Intercropping: Revenue after losses
   int_rev_base_ts <- vv( var_mean = (maize_cl_ts * Maize_Price) +
-                     (cowpea_cl_ts * Cowpea_Price) +
-                     (yellow_cl_ts * Yellow_Beans_Price),
-                     var_CV   = var_CV,
-                     n        = n_years )
+                           (cowpea_cl_ts * Cowpea_Price) +
+                           (yellow_cl_ts * Yellow_Beans_Price),
+                         var_CV   = var_CV,
+                         n        = n_years )
   int_phl_factor  <- chance_event(
-                     chance       = Post_Harvest_Losses,
-                     value_if     = 1 - Reduction_Sale_PHL,
-                     value_if_not = 1,
-                     n            = n_years )
+    chance       = Post_Harvest_Losses,
+    value_if     = 1 - Reduction_Sale_PHL,
+    value_if_not = 1,
+    n            = n_years )
   int_mf_factor   <- chance_event(
-                     chance       = Market_Fluctuation,
-                     value_if     = 1 - Reduction_Sales_MF,
-                     value_if_not = 1,
-                     n            = n_years )
+    chance       = Market_Fluctuation,
+    value_if     = 1 - Reduction_Sales_MF,
+    value_if_not = 1,
+    n            = n_years )
   int_rev_ts      <- int_rev_base_ts * int_phl_factor * int_mf_factor
   
   
@@ -169,6 +169,7 @@ model_function <- function() {
   CumCashflow_Intercropping <- cumsum(Cashflow_Intercropping)
   CumCashflow_Decision      <- cumsum(Cashflow_Decision)
   
+  
   ## Return all outputs
   return(list(
     NPV_Monoculture           = NPV_Monoculture,
@@ -181,6 +182,7 @@ model_function <- function() {
     CumCashflow_Intercropping = CumCashflow_Intercropping,
     CumCashflow_Decision      = CumCashflow_Decision
   ))
+  
 }
 
 
@@ -188,7 +190,7 @@ model_function <- function() {
 combined_simulation <- mcSimulation(
   estimate          = estimates,
   model_function    = model_function,
-  numberOfModelRuns = 10000,
+  numberOfModelRuns = 100,
   functionSyntax    = "plainNames" )
 
 
@@ -326,3 +328,4 @@ ggplot(head(vip_df, 15), aes(x = reorder(Variable, VIP), y = VIP)) +
     y        = "VIP Score"
   ) +
   theme_minimal(base_size = 12)
+
