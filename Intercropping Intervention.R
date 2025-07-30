@@ -190,7 +190,7 @@ model_function <- function() {
 combined_simulation <- mcSimulation(
   estimate          = estimates,
   model_function    = model_function,
-  numberOfModelRuns = 100,
+  numberOfModelRuns = 10000,
   functionSyntax    = "plainNames" )
 
 
